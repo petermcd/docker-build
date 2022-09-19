@@ -108,7 +108,7 @@ class Dockerfile(object):
         Returns:
             True if added, otherwise false
         """
-        for added_file in self._files:
-            if added_file.filename == file.filename and added_file.path == file.path:
-                return True
-        return False
+        return any(
+            added_file.filename == file.filename and added_file.path == file.path
+            for added_file in self._files
+        )
