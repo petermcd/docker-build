@@ -1,9 +1,12 @@
 """Example file."""
+from pathlib import Path
+
 from docker_build.docker import Docker
+from docker_build.models import ExposedPortDetails
 
 # This is an example of how to build the requirements for a container from an existing container.
-
-docker = Docker(container_id='b915fb5efbb1', base_image='scratch')
+path = Path('C:\\Users\\Peter\\Desktop\\')
+docker = Docker(base_path=path, container_id='0e6b30933d1c', base_image='scratch')
 docker.run(
     config_files=[
         '/etc/pam.d/sshd',
@@ -31,7 +34,7 @@ docker.run(
         'mkdir /root/.ssh/',
     ],
     exposed_ports=[
-        '22/tcp',
-        '22/udp',
+        ExposedPortDetails(port=22, protocol='tcp'),
+        ExposedPortDetails(port=22, protocol='udp'),
     ]
 )
