@@ -135,14 +135,18 @@ class Docker(object):
         binary_details.symlink_filename = symlink_filename
         find_stdout_lines = find_response.stdout.splitlines()
         if len(find_stdout_lines) > 1:
-            find_path = '/'
-            for find_stdout_line in find_stdout_lines:
-                if find_stdout_line.startswith('/lib/') or\
-                        find_stdout_line.startswith('/usr/bin/') or\
-                        find_stdout_line.startswith('/usr/sbin/') or\
-                        find_stdout_line.startswith('/usr/lib/'):
-                    find_path = find_stdout_line
-                    break
+            find_path = next(
+                (
+                    find_stdout_line
+                    for find_stdout_line in find_stdout_lines
+                    if find_stdout_line.startswith('/lib/')
+                    or find_stdout_line.startswith('/usr/bin/')
+                    or find_stdout_line.startswith('/usr/sbin/')
+                    or find_stdout_line.startswith('/usr/lib/')
+                ),
+                '/',
+            )
+
         else:
             find_path = find_stdout_lines[0]
         binary_details.symlink_path = split(find_path)[0]
