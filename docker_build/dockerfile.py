@@ -33,12 +33,11 @@ class Dockerfile(object):
         Args:
             commands: Command as a string or a List of commands to add
         """
-        if type(commands) is list:
+        if isinstance(commands, list):
             self._commands += commands
             return
-        if type(commands) is str:
+        if isinstance(commands, str):
             self._commands.append(commands)
-            return
 
     def add_exposed_ports(self, exposed_ports: ExposedPortDetails | list[ExposedPortDetails]):
         """
@@ -47,10 +46,10 @@ class Dockerfile(object):
         Args:
             exposed_ports: Instance or a List of instances ExposedPortDetails to add
         """
-        if type(exposed_ports) is list:
+        if isinstance(exposed_ports, list):
             self._exposed_ports += exposed_ports
             return
-        if type(exposed_ports) is ExposedPortDetails:
+        if isinstance(exposed_ports, ExposedPortDetails):
             self._exposed_ports.append(exposed_ports)
 
     def add_files(self, files: FileDetails | list[FileDetails]):
@@ -60,10 +59,10 @@ class Dockerfile(object):
         Args:
             files: Instance or a List of instances FileDetails to add
         """
-        if type(files) is list:
+        if isinstance(files, list):
             self._files += files
             return
-        if type(files) is FileDetails:
+        if isinstance(files, FileDetails):
             self._files.append(files)
 
     def build(self, save_path: Path, entry_point: str | None = None):
