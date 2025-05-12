@@ -109,7 +109,7 @@ class Docker(object):
             ls_response = self._run_command(command=ls_command)
         except DockerException as exc:
             raise FileNotFoundError(f'{file} could not be found') from exc
-        binary_ls_split = ls_response.stdout.strip().split(' ')
+        binary_ls_split = ls_response.stdout.strip().split()
         path, filename = split(file)
         symlink_path = ''
         if binary_ls_split[0].startswith('l'):
@@ -121,6 +121,7 @@ class Docker(object):
                 file,
             ]
             symlink_path = self._run_command(command=file_path_command).stdout.strip()
+
         binary_details = FileDetails(
             filename=filename,
             path=path,
@@ -128,37 +129,7 @@ class Docker(object):
             saved_path_relative=Path(),
             symlink=symlink_path,
         )
-        if binary_ls_split[-2] != '->':
-            return binary_details
-        symlink_filename = split(binary_ls_split[-1])[-1]
-        find_command: list[str] = [
-            'docker',
-            'exec',
-            self._container_id,
-            'find',
-            '/',
-            '-name',
-            symlink_filename,
-        ]
-        find_response = self._run_command(command=find_command)
-        binary_details.symlink = symlink_filename
-        find_stdout_lines = find_response.stdout.splitlines()
-        if len(find_stdout_lines) > 1:
-            find_path = next(
-                (
-                    find_stdout_line
-                    for find_stdout_line in find_stdout_lines
-                    if find_stdout_line.startswith('/lib/')
-                    or find_stdout_line.startswith('/usr/bin/')
-                    or find_stdout_line.startswith('/usr/sbin/')
-                    or find_stdout_line.startswith('/usr/lib/')
-                ),
-                '/',
-            )
 
-        else:
-            find_path = find_stdout_lines[0]
-        binary_details.symlink = split(find_path)[0]
         return binary_details
 
     def _parse_ldd(self, output: str):
