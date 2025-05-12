@@ -1,5 +1,5 @@
-"""Dummy test to satisfy pytest until real tests are written."""
+"""Temporary test to satisfy pytest until real tests are written."""
 
 
-def test_dummy():
-    """Dummy test."""
+def test_temporary():
+    """Temporary test."""
