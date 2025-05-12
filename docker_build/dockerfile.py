@@ -38,7 +38,6 @@ class Dockerfile(object):
             return
         if type(commands) is str:
             self._commands.append(commands)
-            return
 
     def add_exposed_ports(self, exposed_ports: ExposedPortDetails | list[ExposedPortDetails]):
         """
