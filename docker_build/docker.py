@@ -141,7 +141,7 @@ class Docker(object):
             symlink_filename,
         ]
         find_response = self._run_command(command=find_command)
-        binary_details.symlink_filename = symlink_filename
+        binary_details.symlink = symlink_filename
         find_stdout_lines = find_response.stdout.splitlines()
         if len(find_stdout_lines) > 1:
             find_path = next(
@@ -158,7 +158,7 @@ class Docker(object):
 
         else:
             find_path = find_stdout_lines[0]
-        binary_details.symlink_path = split(find_path)[0]
+        binary_details.symlink = split(find_path)[0]
         return binary_details
 
     def _parse_ldd(self, output: str):

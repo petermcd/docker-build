@@ -34,10 +34,10 @@ class Dockerfile(object):
         Args:
             commands: Command as a string or a List of commands to add
         """
-        if type(commands) == list:
+        if type(commands) is list:
             self._commands += commands
             return
-        if type(commands) == str:
+        if type(commands) is str:
             self._commands.append(commands)
             return
 
@@ -48,10 +48,10 @@ class Dockerfile(object):
         Args:
             exposed_ports: Instance or a List of instances ExposedPortDetails to add
         """
-        if type(exposed_ports) == list:
+        if type(exposed_ports) is list:
             self._exposed_ports += exposed_ports
             return
-        if type(exposed_ports) == ExposedPortDetails:
+        if type(exposed_ports) is ExposedPortDetails:
             self._exposed_ports.append(exposed_ports)
             return
 
@@ -62,10 +62,10 @@ class Dockerfile(object):
         Args:
             files: Instance or a List of instances FileDetails to add
         """
-        if type(files) == list:
+        if type(files) is list:
             self._files += files
             return
-        if type(files) == FileDetails:
+        if type(files) is FileDetails:
             self._files.append(files)
             return
 
