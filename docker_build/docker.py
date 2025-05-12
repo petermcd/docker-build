@@ -46,7 +46,8 @@ class Docker(object):
             config_files: list[str],
             binaries: list[str],
             exposed_ports: list[ExposedPortDetails],
-            commands: list[str]
+            commands: list[str],
+            entry_point: str | None = None,
     ):
         """
         Build a dockerfile based on the inputs.
@@ -56,6 +57,7 @@ class Docker(object):
             binaries: List of binary files to copy out of the origin container
             exposed_ports: Ports to be exposed
             commands: List of commands to be run during making of the container
+            entry_point: Entry point to be set in the container
         """
         self._dockerfile.add_commands(commands=commands)
         self._dockerfile.add_exposed_ports(exposed_ports=exposed_ports)
@@ -63,7 +65,7 @@ class Docker(object):
         self._process_binaries(binaries=binaries)
         self._process_config_files(config_files=config_files)
 
-        self._dockerfile.build(save_path=self._base_path)
+        self._dockerfile.build(save_path=self._base_path, entry_point=entry_point)
 
     def _copy_file(self, file_details: FileDetails):
         """

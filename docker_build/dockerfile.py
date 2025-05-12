@@ -69,12 +69,13 @@ class Dockerfile(object):
             self._files.append(files)
             return
 
-    def build(self, save_path: Path):
+    def build(self, save_path: Path, entry_point: str | None = None):
         """
         Build the dockerfile and save it in the specified path.
 
         Args:
             save_path: Path and filename to save the Dockerfile too
+            entry_point: Entry point to be set in the container
         """
         output = f'FROM {self._base_image}\n\n'
 
@@ -94,6 +95,9 @@ class Dockerfile(object):
             if exposed_port.protocol:
                 output += f'/{exposed_port.protocol}'
             output += '\n'
+
+        if entry_point:
+            output += f'ENTRYPOINT {entry_point}\n'
 
         with open(save_path.joinpath('Dockerfile'), 'w') as fh:
             fh.write(output)
