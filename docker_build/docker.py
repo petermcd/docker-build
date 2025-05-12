@@ -107,8 +107,8 @@ class Docker(object):
         ]
         try:
             ls_response = self._run_command(command=ls_command)
-        except DockerException:
-            raise FileNotFoundError(f'{file} could not be found')
+        except DockerException as exc:
+            raise FileNotFoundError(f'{file} could not be found') from exc
         binary_ls_split = ls_response.stdout.strip().split(' ')
         path, filename = split(file)
         symlink_path = ''
@@ -178,7 +178,7 @@ class Docker(object):
                 is_first = False
                 continue
             line = line.strip()
-            line_split = line.split(' ')
+            line_split = line.split()
             if not line or line_split[1] != '=>':
                 file_ldd_path = line_split[0]
             else:
