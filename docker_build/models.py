@@ -1,4 +1,4 @@
-"""Dateclasses used by the package."""
+"""Date classes used by the package."""
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,8 +19,7 @@ class FileDetails(object):
     path: str
     saved_path: Path
     saved_path_relative: Path
-    symlink_filename: str
-    symlink_path: str
+    symlink: str
 
 
 @dataclass

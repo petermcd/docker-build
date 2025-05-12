@@ -17,7 +17,7 @@ class Dockerfile(object):
 
     def __init__(self, base_image: str):
         """
-        Initialise Dockerfile.
+        Initialize Dockerfile.
 
         Args:
             base_image: The image to base the new image from
@@ -34,10 +34,10 @@ class Dockerfile(object):
         Args:
             commands: Command as a string or a List of commands to add
         """
-        if type(commands) == list:
+        if type(commands) is list:
             self._commands += commands
             return
-        if type(commands) == str:
+        if type(commands) is str:
             self._commands.append(commands)
             return
 
@@ -46,12 +46,12 @@ class Dockerfile(object):
         Add exposed ports.
 
         Args:
-            exposed_ports: Instance or a List of instances of ExposedPortDetails to add
+            exposed_ports: Instance or a List of instances ExposedPortDetails to add
         """
-        if type(exposed_ports) == list:
+        if type(exposed_ports) is list:
             self._exposed_ports += exposed_ports
             return
-        if type(exposed_ports) == ExposedPortDetails:
+        if type(exposed_ports) is ExposedPortDetails:
             self._exposed_ports.append(exposed_ports)
             return
 
@@ -60,12 +60,12 @@ class Dockerfile(object):
         Add files that will be copied to the container.
 
         Args:
-            files: Instance or a List of instances of FileDetails to add
+            files: Instance or a List of instances FileDetails to add
         """
-        if type(files) == list:
+        if type(files) is list:
             self._files += files
             return
-        if type(files) == FileDetails:
+        if type(files) is FileDetails:
             self._files.append(files)
             return
 

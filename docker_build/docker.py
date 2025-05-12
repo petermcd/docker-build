@@ -24,7 +24,7 @@ class Docker(object):
 
     def __init__(self, base_path: Path, container_id: str, base_image: str):
         """
-        Initialise Docker.
+        Initialize Docker.
 
         Args:
             base_path: Path to save files too
@@ -53,7 +53,7 @@ class Docker(object):
 
         Args:
             config_files: List of config files to copy out of the origin container
-            binaries: List of binaries files to copy out of the origin container
+            binaries: List of binary files to copy out of the origin container
             exposed_ports: Ports to be exposed
             commands: List of commands to be run during making of the container
         """
@@ -67,7 +67,7 @@ class Docker(object):
 
     def _copy_file(self, file_details: FileDetails):
         """
-        Copy file from the container.
+        Copy a file from the container.
 
         Args:
             file_details: Details about the file to be copied
@@ -76,8 +76,8 @@ class Docker(object):
             return
 
         source_path: str = f'{file_details.path}/{file_details.filename}'
-        if file_details.symlink_path:
-            source_path = f'{file_details.symlink_path}/{file_details.symlink_filename}'
+        if file_details.symlink:
+            source_path = file_details.symlink
         command: list[str] = [
             'docker',
             'cp',
@@ -87,12 +87,12 @@ class Docker(object):
         self._run_command(command=command)
         self._dockerfile.add_files(files=file_details)
 
-    def _get_file_origin(self, filename: str) -> FileDetails:
+    def _get_file_origin(self, file: str) -> FileDetails:
         """
         Locate the original path for the file.
 
         Args:
-            filename: Filename to search for
+            file: Filename and path to search for
 
         Returns:
             Real path and filename
@@ -103,53 +103,33 @@ class Docker(object):
             self._container_id,
             'ls',
             '-la',
-            filename,
+            file,
         ]
         try:
             ls_response = self._run_command(command=ls_command)
-        except DockerException:
-            raise FileNotFoundError(f'{filename} could not be found')
-        binary_ls_split = ls_response.stdout.strip().split(' ')
-        path, filename = split(filename)
+        except DockerException as exc:
+            raise FileNotFoundError(f'{file} could not be found') from exc
+        binary_ls_split = ls_response.stdout.strip().split()
+        path, filename = split(file)
+        symlink_path = ''
+        if binary_ls_split[0].startswith('l'):
+            file_path_command = [
+                'docker',
+                'exec',
+                self._container_id,
+                'realpath',
+                file,
+            ]
+            symlink_path = self._run_command(command=file_path_command).stdout.strip()
+
         binary_details = FileDetails(
             filename=filename,
             path=path,
             saved_path=Path(),
             saved_path_relative=Path(),
-            symlink_filename='',
-            symlink_path='',
+            symlink=symlink_path,
         )
-        if binary_ls_split[-2] != '->':
-            return binary_details
-        symlink_filename = split(binary_ls_split[-1])[-1]
-        find_command: list[str] = [
-            'docker',
-            'exec',
-            self._container_id,
-            'find',
-            '/',
-            '-name',
-            symlink_filename,
-        ]
-        find_response = self._run_command(command=find_command)
-        binary_details.symlink_filename = symlink_filename
-        find_stdout_lines = find_response.stdout.splitlines()
-        if len(find_stdout_lines) > 1:
-            find_path = next(
-                (
-                    find_stdout_line
-                    for find_stdout_line in find_stdout_lines
-                    if find_stdout_line.startswith('/lib/')
-                    or find_stdout_line.startswith('/usr/bin/')
-                    or find_stdout_line.startswith('/usr/sbin/')
-                    or find_stdout_line.startswith('/usr/lib/')
-                ),
-                '/',
-            )
 
-        else:
-            find_path = find_stdout_lines[0]
-        binary_details.symlink_path = split(find_path)[0]
         return binary_details
 
     def _parse_ldd(self, output: str):
@@ -169,14 +149,14 @@ class Docker(object):
                 is_first = False
                 continue
             line = line.strip()
-            line_split = line.split(' ')
+            line_split = line.split()
             if not line or line_split[1] != '=>':
                 file_ldd_path = line_split[0]
             else:
                 file_ldd_path = line_split[2]
             try:
                 file_details = self._get_file_origin(
-                    filename=file_ldd_path
+                    file=file_ldd_path
                 )
                 file_details.saved_path = Path(self._base_path, BINARY_DIRECTORY, file_details.filename)
                 file_details.saved_path_relative = Path('./', BINARY_DIRECTORY, file_details.filename)
@@ -202,7 +182,7 @@ class Docker(object):
             command_output = self._run_command(command=command)
             self._parse_ldd(command_output.stdout)
             file_details = self._get_file_origin(
-                filename=binary
+                file=binary
             )
             file_details.saved_path = Path(self._base_path, BINARY_DIRECTORY, file_details.filename)
             file_details.saved_path_relative = Path('./', BINARY_DIRECTORY, file_details.filename)
@@ -217,7 +197,7 @@ class Docker(object):
         """
         for config_file in config_files:
             file_details = self._get_file_origin(
-                filename=config_file
+                file=config_file
             )
             file_details.saved_path = Path(self._base_path, CONFIG_DIRECTORY, file_details.filename)
             file_details.saved_path_relative = Path('./', CONFIG_DIRECTORY, file_details.filename)
