@@ -1,6 +1,5 @@
 """Module to build dockerfiles."""
 from pathlib import Path
-from typing import Union
 
 from docker_build.models import ExposedPortDetails, FileDetails
 
@@ -27,7 +26,7 @@ class Dockerfile(object):
         self._exposed_ports: list[ExposedPortDetails] = []
         self._files: list[FileDetails] = []
 
-    def add_commands(self, commands: Union[str, list[str]]):
+    def add_commands(self, commands: str | list[str]):
         """
         Add commands.
 
@@ -41,7 +40,7 @@ class Dockerfile(object):
             self._commands.append(commands)
             return
 
-    def add_exposed_ports(self, exposed_ports: Union[ExposedPortDetails, list[ExposedPortDetails]]):
+    def add_exposed_ports(self, exposed_ports: ExposedPortDetails | list[ExposedPortDetails]):
         """
         Add exposed ports.
 
@@ -53,9 +52,8 @@ class Dockerfile(object):
             return
         if type(exposed_ports) is ExposedPortDetails:
             self._exposed_ports.append(exposed_ports)
-            return
 
-    def add_files(self, files: Union[FileDetails, list[FileDetails]]):
+    def add_files(self, files: FileDetails | list[FileDetails]):
         """
         Add files that will be copied to the container.
 
@@ -67,7 +65,6 @@ class Dockerfile(object):
             return
         if type(files) is FileDetails:
             self._files.append(files)
-            return
 
     def build(self, save_path: Path, entry_point: str | None = None):
         """
